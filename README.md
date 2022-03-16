@@ -25,7 +25,7 @@
         });
     });
 
-从IntegrationEvent中派生发布的事件类
+派生发布的事件类和事件处理类
 
     public class EmailTokenEvent : IntegrationEvent
     {
@@ -40,10 +40,22 @@
         public string Body { get; set; }
     }
 
+    public class EmailTokenEventHandler : IIntegrationEventHandler<EmailTokenEvent>
+    {
+        public async Task HandleAsync(EmailTokenEvent @event)
+        {
+        }
+    }
+
+注册订阅处理
+
+    var eventBus = app.ApplicationServices.GetRequiredService<RabbitMqEventBus<RabbitMqEventBusContext>>();
+    eventBus.Subscribe<EmailTokenEvent, EmailTokenEventHandler>();
+
 
 发送消息到RabbitMQ队列
 
-    var eventBus = _services.GetService<RabbitMqEventBus<RabbitMqEventBusContext>>();
+    var eventBus = _services.GetRequiredService<RabbitMqEventBus<RabbitMqEventBusContext>>();
     await eventBus.Publish(new EmailTokenEvent()
     {
         Destination = new string[] { "email" },
